@@ -1,0 +1,279 @@
+/* Auth Pages Styling (Login & Register) */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #D4C5B0 0%, #A0876D 100%);
+  padding: 20px;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 40px;
+  max-width: 400px;
+  width: 100%;
+  border-left: 4px solid #8B7355;
+}
+
+.auth-card h2 {
+  color: #333;
+  margin: 0 0 30px 0;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #8B7355;
+  box-shadow: 0 0 0 2px rgba(139, 115, 85, 0.1);
+}
+
+.form-group input:disabled {
+  background: #f9f9f9;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #8B7355 0%, #A0876D 100%);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  margin-top: 10px;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 115, 85, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border-left: 4px solid #c33;
+  font-size: 14px;
+}
+
+.success-message {
+  background: #efe;
+  color: #3c3;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  border-left: 4px solid #3c3;
+  font-size: 14px;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #666;
+}
+
+.auth-link a {
+  color: #8B7355;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s;
+}
+
+.auth-link a:hover {
+  color: #6f5a45;
+  text-decoration: underline;
+}
+
+.loading {
+  display: inline-block;
+  opacity: 0.6;
+}
+
+/* Tablet Responsiveness */
+@media (max-width: 760px) {
+  .auth-container {
+    padding: 15px;
+  }
+
+  .auth-card {
+    padding: 30px;
+    max-width: 100%;
+    border-radius: 8px;
+  }
+
+  .auth-card h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+
+  .form-group {
+    margin-bottom: 18px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 7px;
+  }
+
+  .form-group input {
+    padding: 11px;
+    font-size: 14px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 18px;
+  }
+
+  .submit-btn {
+    padding: 11px;
+    font-size: 15px;
+    margin-top: 10px;
+  }
+
+  .error-message,
+  .success-message {
+    padding: 11px;
+    margin-bottom: 18px;
+    font-size: 13px;
+  }
+
+  .auth-link {
+    margin-top: 18px;
+    font-size: 13px;
+  }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 12px;
+    min-height: 100vh;
+  }
+
+  .auth-card {
+    padding: 20px;
+    border-radius: 6px;
+    max-width: 100%;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .auth-card h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-size: 12px;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .form-group input {
+    padding: 10px;
+    font-size: 13px;
+    border-radius: 4px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .form-row .form-group {
+    margin-bottom: 15px;
+  }
+
+  .submit-btn {
+    padding: 10px;
+    font-size: 14px;
+    margin-top: 8px;
+    border-radius: 4px;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(139, 115, 85, 0.3);
+  }
+
+  .error-message,
+  .success-message {
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    border-radius: 4px;
+  }
+
+  .auth-link {
+    margin-top: 15px;
+    font-size: 12px;
+  }
+
+  .auth-link a {
+    font-weight: 600;
+  }
+}
