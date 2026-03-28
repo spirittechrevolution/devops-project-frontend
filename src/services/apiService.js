@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-// Configuration de base - Utilise la variable d'environnement ou défaut à localhost:3000
+// Configuration de base - Utilise la variable d'environnement ou defaut a localhost:3000
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'
 
 const api = axios.create({
@@ -11,7 +11,7 @@ const api = axios.create({
   },
 })
 
-// Intercepteur pour ajouter le token JWT
+// Intercepteur pour ajouter le token JWT a chaque requete
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken')
   if (token) {
@@ -20,7 +20,7 @@ api.interceptors.request.use((config) => {
   return config
 })
 
-// Intercepteur pour gérer les erreurs d'authentification
+// Intercepteur pour gerer les erreurs d'authentification
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -46,7 +46,7 @@ export const userService = {
 export const bookService = {
   createBook: (bookData) => api.post('/books', bookData),
   getAllBooks: (page = 1, limit = 10) => api.get(`/books?page=${page}&limit=${limit}`),
-  searchBooks: (query) => api.get(`/books/search?q=${query}`),
+  searchBooks: (query) => api.get(`/books/search?query=${query}`),
   getBookById: (id) => api.get(`/books/${id}`),
   updateBook: (id, bookData) => api.put(`/books/${id}`, bookData),
   deleteBook: (id) => api.delete(`/books/${id}`),
@@ -57,7 +57,8 @@ export const borrowingService = {
   borrowBook: (borrowData) => api.post('/borrowings/borrow', borrowData),
   returnBook: (borrowingId) => api.post(`/borrowings/${borrowingId}/return`),
   getAllBorrowings: () => api.get('/borrowings'),
-  getUserBorrowings: () => api.get('/borrowings/user/borrowings'),
+  // Nous corrigeons l'endpoint : le backend definit /my-borrowings et non /user/borrowings
+  getMyBorrowings: () => api.get('/borrowings/my-borrowings'),
 }
 
 // ==================== HEALTH CHECK ====================

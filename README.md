@@ -1,168 +1,155 @@
-# DevOps Project Frontend
+# Bibliothèque Numérique DIT — Frontend
 
-Frontend pour le projet DevOps utilisant React + Vite.
+Interface web développée avec React et Vite pour la gestion de la bibliothèque académique du Dakar Institute of Technology.
 
-## 🚀 Démarrage rapide
+## Architecture du projet
 
-### Installation des dépendances
+```
+src/
+├── components/       # Composants réutilisables
+│   ├── Layout.jsx    # Header et sidebar partagés entre toutes les pages
+│   └── ProtectedRoute.jsx
+├── context/
+│   └── AuthContext.jsx  # Gestion de l'authentification et de la session
+├── pages/
+│   ├── Login.jsx        # Page de connexion
+│   ├── Register.jsx     # Page d'inscription
+│   ├── Dashboard.jsx    # Tableau de bord avec statistiques
+│   ├── Books.jsx        # Gestion des livres
+│   ├── Borrowings.jsx   # Gestion des emprunts
+│   └── Profile.jsx      # Profil utilisateur
+├── services/
+│   └── apiService.js    # Tous les appels API centralisés
+├── styles/              # Fichiers CSS par page
+└── main.jsx             # Point d'entrée
+```
+
+## Prérequis
+
+- Node.js v14 ou supérieur
+- npm
+- Le backend doit être démarré et accessible
+
+## Installation
+
+### 1. Installer les dépendances
+
 ```bash
 npm install
 ```
 
-### Développement
+### 2. Configurer les variables d'environnement
+
+Créer un fichier `.env` à la racine du projet frontend :
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+```
+
+> Si le backend tourne sur un port différent, adapter cette valeur en conséquence.
+
+### 3. Démarrer l'application
+
+**Mode développement :**
 ```bash
 npm run dev
 ```
-Le serveur de développement démarrera sur http://localhost:3000
 
-### Build pour la production
+L'application est accessible sur `http://localhost:5173`
+
+**Build de production :**
 ```bash
 npm run build
 ```
 
-### Preview du build
+**Prévisualiser le build :**
 ```bash
 npm run preview
 ```
 
-## 📁 Structure du projet
+## Fonctionnalités par page
 
-```
-project_devops_front/
-├── src/
-│   ├── App.jsx      # Composant principal
-│   ├── App.css      # Styles du composant App
-│   ├── index.css    # Styles globaux
-│   └── main.jsx     # Point d'entrée
-├── public/          # Fichiers statiques
-├── index.html       # HTML principal
-├── vite.config.js   # Configuration Vite
-├── package.json     # Dépendances
-└── README.md        # Documentation
-```
+### Connexion et inscription (`/login`, `/register`)
+- Formulaire de connexion avec afficher/masquer le mot de passe
+- Inscription avec choix de la fonction : Étudiant, Professeur, Personnel administratif
+- Redirection automatique vers le tableau de bord après connexion
 
-## 🛠️ Technologies utilisées
+### Tableau de bord (`/dashboard`)
+- Statistiques en temps réel chargées depuis l'API
+- Affichage adapté selon la fonction de l'utilisateur connecté
+  - **Admin** : total de tous les livres, tous les emprunts, emprunts en cours, retards
+  - **Autres** : livres disponibles, leurs propres emprunts
+- Navigation latérale avec indication de la page active
 
-- **React** 18.2.0 - Bibliothèque UI
-- **Vite** 5.0.0 - Build tool rapide
-- **Axios** - Client HTTP pour les requêtes API
+### Bibliothèque (`/books`)
+- Liste de tous les livres avec recherche par titre, auteur ou ISBN
+- **Admin uniquement** : ajouter, modifier, supprimer un livre
+- Tous les utilisateurs : emprunter un livre (durée de 30 jours)
 
-## 📡 API Configuration
+### Emprunts (`/borrowings`)
+- **Admin** : voir tous les emprunts de tous les utilisateurs
+- **Autres** : voir uniquement ses propres emprunts
+- Filtres par statut : Tous, En cours, En retard, Retournés
+- Compteur de jours de retard pour les emprunts dépassés
+- Retourner un livre directement depuis la liste
+- Modal de détails pour chaque emprunt
 
-Le proxy API est configuré dans `vite.config.js` :
-- Les requêtes vers `/api/*` sont redirigées vers `http://localhost:3000/api/v1`
+### Profil (`/profile`)
+- Affichage des informations du compte : prénom, nom, email, fonction
+- Modification du prénom et du nom uniquement
+- Changement de mot de passe avec vérification de l'ancien
 
-Exemple d'utilisation :
+## Gestion des rôles
+
+L'interface s'adapte automatiquement selon la fonction de l'utilisateur connecté.
+
+| Fonctionnalité | Étudiant / Professeur | Admin |
+|---|---|---|
+| Voir les livres | Oui | Oui |
+| Emprunter un livre | Oui | Oui |
+| Ajouter un livre | Non | Oui |
+| Modifier un livre | Non | Oui |
+| Supprimer un livre | Non | Oui |
+| Voir ses emprunts | Oui | Oui |
+| Voir tous les emprunts | Non | Oui |
+
+## Authentification
+
+La session est gérée avec un token JWT stocké dans le `localStorage`. Le token est automatiquement ajouté à chaque requête via un intercepteur Axios.
+
+Si le token expire ou est invalide, l'utilisateur est redirigé vers la page de connexion.
+
+**En cas de problème de session** (page blanche, redirection en boucle), vider le `localStorage` depuis la console du navigateur :
+
 ```javascript
-import axios from 'axios'
-
-// Cette requête ira vers http://localhost:3000/api/v1/users
-axios.get('/api/users')
+localStorage.clear()
 ```
 
-## 🐳 Docker
+Puis recharger la page.
 
-### Build de l'image Docker
+## Dépendances principales
 
+- **React 18** — interface utilisateur
+- **React Router v6** — navigation entre les pages
+- **Axios** — appels HTTP vers le backend
+- **Vite** — outil de build et serveur de développement
+
+## Branche de développement
+
+Les améliorations du frontend sont développées sur la branche :
+
+```
+feature/samuel-frontend
+```
+
+Pour créer une branche et basculer dessus :
 ```bash
-# Image locale
-docker build -t devops-frontend:latest .
-
-# Image Docker Hub
-docker build -t spirittechrevolution/devops-project-frontend:latest .
+git checkout -b feature/prenom-frontend
 ```
 
-### Exécution du conteneur
-
+Pour pousser le travail en ligne :
 ```bash
-# Développement
-docker run -p 5173:80 devops-frontend:latest
-
-# Production avec configuration API
-docker run -d \
-  -p 80:80 \
-  -e VITE_API_URL=https://api.example.com/api/v1 \
-  spirittechrevolution/devops-project-frontend:latest
+git add .
+git commit -m "feat: amélioration du frontend"
+git push origin feature/prenom-frontend
 ```
-
-### Avec Docker Compose
-
-```bash
-# Depuis le répertoire du backend
-cd ../projet-devops
-
-# Démarrer tous les services
-docker-compose up -d
-
-# Accès frontend: http://localhost:5173
-```
-
-**Caractéristiques du Dockerfile:**
-- ✅ Build multi-stage (réduction de ~90%)
-- ✅ Node 18 Alpine (builder)
-- ✅ Nginx Alpine (production)
-- ✅ Gzip compression
-- ✅ Health check
-- ✅ Security headers
-- ✅ SPA routing
-
-Pour plus de détails, voir [DOCKER_CONFIG.md](./DOCKER_CONFIG.md)
-
-## 🔄 GitHub Actions CI/CD
-
-Le frontend est automatiquement construit et poussé vers Docker Hub lors:
-- ✅ Push sur la branche `main`
-- ✅ Création de tags de version (`v1.0.0`, etc.)
-- ✅ Pull requests (build uniquement, pas de push)
-
-### Workflow
-
-**Fichier**: `.github/workflows/frontend-docker-build-push.yml`
-
-**Images générées**:
-- Image: `spirittechrevolution/devops-project-frontend`
-- Tags: `latest`, `v1.0.0`, `main`, `sha-{commit}`
-- Registry: Docker Hub
-
-### Configuration requise
-
-1. **Docker Hub**
-   - Username: `spirittechrevolution`
-   - Repository: `devops-project-frontend`
-
-2. **GitHub Secrets**
-   - `DOCKER_USERNAME` → Docker Hub username
-   - `DOCKER_TOKEN` → Docker Hub access token
-
-Voir [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) pour les détails de configuration.
-
-### Déploiement automatique
-
-```bash
-# Créer un tag de version
-git tag v1.0.0
-git push origin v1.0.0
-
-# GitHub Actions:
-# 1. Détecte le tag
-# 2. Construit l'image
-# 3. La pousse vers Docker Hub avec:
-#    - v1.0.0
-#    - 1.0
-#    - 1
-#    - latest
-```
-
-## 📚 Documentation complète
-
-- [DOCKER.md](./DOCKER.md) - Configuration Docker détaillée
-- [DOCKER_CONFIG.md](./DOCKER_CONFIG.md) - Paramètres Docker avancés
-- [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) - GitHub Actions et CI/CD
-- [../README.md](../README.md) - Documentation du projet complet
-
-## 📝 Notes
-
-- Modifiez les fichiers dans `src/` et le navigateur se rechargera automatiquement (HMR)
-- Le build de production optimise et minifie le code
-- Le conteneur Docker crée une image optimisée pour la production
-- Les images sont automatiquement publiées sur Docker Hub via GitHub Actions

@@ -1,20 +1,22 @@
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { userService } from '../services/apiService'
+import { Layout } from '../components/Layout'
 import '../styles/profile.css'
 
 export const Profile = () => {
-  const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
+
   const [editMode, setEditMode] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
   const [formData, setFormData] = useState({
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
   })
+
   const [passwordData, setPasswordData] = useState({
     oldPassword: '',
     newPassword: '',
@@ -26,13 +28,19 @@ export const Profile = () => {
     setLoading(true)
     setError('')
     setSuccess('')
-
     try {
       await userService.updateProfile(formData)
-      setSuccess('Profil mis à jour avec succès!')
+
+      updateUser({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+      })
+
+      setSuccess('Profil mis a jour avec succes !')
       setEditMode(false)
     } catch (err) {
-      setError('Erreur lors de la mise à jour du profil')
+      const msg = err.response?.data?.message
+      setError(msg || 'Erreur lors de la mise a jour du profil')
     } finally {
       setLoading(false)
     }
@@ -47,70 +55,92 @@ export const Profile = () => {
       setError('Les mots de passe ne correspondent pas')
       return
     }
-
     if (passwordData.newPassword.length < 6) {
-      setError('Le nouveau mot de passe doit contenir au moins 6 caractères')
+      setError('Le nouveau mot de passe doit contenir au moins 6 caracteres')
       return
     }
 
     setLoading(true)
-
     try {
       await userService.changePassword({
         oldPassword: passwordData.oldPassword,
         newPassword: passwordData.newPassword,
       })
-      setSuccess('Mot de passe changé avec succès!')
+      setSuccess('Mot de passe change avec succes !')
       setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' })
     } catch (err) {
-      setError('Erreur lors du changement de mot de passe')
+      const msg = err.response?.data?.message
+      if (msg === 'Invalid current password') {
+        setError('Mot de passe actuel incorrect')
+      } else {
+        setError(msg || 'Erreur lors du changement de mot de passe')
+      }
     } finally {
       setLoading(false)
     }
   }
 
+  const getFonctionLabel = (userType) => {
+    const fonctions = {
+      student: 'Etudiant',
+      professor: 'Professeur',
+      admin: 'Personnel administratif',
+    }
+    return fonctions[userType] || userType || 'Non defini'
+  }
+
+  const handleCancelEdit = () => {
+    setEditMode(false)
+    setFormData({
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+    })
+    setError('')
+  }
+
   return (
-    <div className="profile-page">
-      <div className="page-header-navigation">
-        <button onClick={() => navigate('/dashboard')} className="btn-back">
-          Retour au tableau de bord
-        </button>
-      </div>
+    <Layout>
+
       <h1>Mon Profil</h1>
 
       {error && <div className="error-message">{error}</div>}
       {success && <div className="success-message">{success}</div>}
 
       <div className="profile-container">
+
         <div className="profile-section">
-          <h2>Informations Personnelles</h2>
+          <h3>Informations personnelles</h3>
 
           {!editMode ? (
-            <div className="profile-info">
-              <div className="info-item">
-                <label>Prénom</label>
-                <p>{user?.firstName}</p>
+            <div>
+              <div className="profile-info">
+                <div className="info-item">
+                  <span className="info-label">Prenom</span>
+                  <span className="info-value">{user?.firstName}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Nom</span>
+                  <span className="info-value">{user?.lastName}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Email</span>
+                  <span className="info-value">{user?.email}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Fonction</span>
+                  <span className="info-value">{getFonctionLabel(user?.userType)}</span>
+                </div>
               </div>
-              <div className="info-item">
-                <label>Nom</label>
-                <p>{user?.lastName}</p>
+              <div className="profile-actions">
+                <button onClick={() => setEditMode(true)} className="edit-btn">
+                  Modifier
+                </button>
               </div>
-              <div className="info-item">
-                <label>Email</label>
-                <p>{user?.email}</p>
-              </div>
-              <div className="info-item">
-                <label>Rôle</label>
-                <p>{user?.role || 'Utilisateur'}</p>
-              </div>
-              <button onClick={() => setEditMode(true)} className="edit-btn">
-                ✏️ Modifier
-              </button>
             </div>
           ) : (
             <form onSubmit={handleUpdateProfile} className="edit-form">
               <div className="form-group">
-                <label>Prénom</label>
+                <label>Prenom</label>
                 <input
                   type="text"
                   value={formData.firstName}
@@ -118,7 +148,6 @@ export const Profile = () => {
                   required
                 />
               </div>
-
               <div className="form-group">
                 <label>Nom</label>
                 <input
@@ -128,12 +157,16 @@ export const Profile = () => {
                   required
                 />
               </div>
-
               <div className="form-actions">
-                <button type="submit" disabled={loading}>
-                  {loading ? 'Mise à jour...' : 'Enregistrer'}
+                <button type="submit" className="save-btn" disabled={loading}>
+                  {loading ? 'Mise a jour...' : 'Enregistrer'}
                 </button>
-                <button type="button" onClick={() => setEditMode(false)} className="cancel-btn">
+                <button
+                  type="button"
+                  className="cancel-btn"
+                  onClick={handleCancelEdit}
+                  disabled={loading}
+                >
                   Annuler
                 </button>
               </div>
@@ -142,31 +175,32 @@ export const Profile = () => {
         </div>
 
         <div className="profile-section">
-          <h2>Changer le mot de passe</h2>
-
+          <h3>Changer le mot de passe</h3>
           <form onSubmit={handleChangePassword} className="password-form">
             <div className="form-group">
-              <label>Ancien mot de passe</label>
+              <label>Mot de passe actuel</label>
               <input
                 type="password"
                 value={passwordData.oldPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, oldPassword: e.target.value })}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, oldPassword: e.target.value })
+                }
                 required
               />
             </div>
-
             <div className="form-group">
               <label>Nouveau mot de passe</label>
               <input
                 type="password"
                 value={passwordData.newPassword}
-                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                onChange={(e) =>
+                  setPasswordData({ ...passwordData, newPassword: e.target.value })
+                }
                 required
               />
             </div>
-
             <div className="form-group">
-              <label>Confirmer le mot de passe</label>
+              <label>Confirmer le nouveau mot de passe</label>
               <input
                 type="password"
                 value={passwordData.confirmPassword}
@@ -176,13 +210,15 @@ export const Profile = () => {
                 required
               />
             </div>
-
-            <button type="submit" disabled={loading}>
-              {loading ? 'Changement en cours...' : 'Changer le mot de passe'}
-            </button>
+            <div className="form-actions">
+              <button type="submit" className="save-btn" disabled={loading}>
+                {loading ? 'Changement en cours...' : 'Changer le mot de passe'}
+              </button>
+            </div>
           </form>
         </div>
+
       </div>
-    </div>
+    </Layout>
   )
 }

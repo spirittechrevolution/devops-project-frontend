@@ -1,23 +1,23 @@
-# Frontend Docker Configuration
+# Configuration Docker Frontend
 
-This file documents the Docker-specific configuration for the frontend.
+Ce fichier documente la configuration Docker spécifique au frontend.
 
-## Quick Reference
+## Référence rapide
 
-### Build
+### Construction
 
 ```bash
-# Build locally
+# Construction locale
 docker build -t devops-project-frontend:latest .
 
-# Build with tag
+# Construction avec tag
 docker build -t spirittechrevolution/devops-project-frontend:v1.0.0 .
 ```
 
-### Run
+### Lancement
 
 ```bash
-# Development
+# Développement
 docker run -p 5173:80 devops-project-frontend:latest
 
 # Production
@@ -28,132 +28,132 @@ docker run -d \
   spirittechrevolution/devops-project-frontend:latest
 ```
 
-### Push to Docker Hub
+### Publication sur Docker Hub
 
 ```bash
-# Login
+# Connexion
 docker login
 
-# Push
+# Publication
 docker push spirittechrevolution/devops-project-frontend:v1.0.0
 docker push spirittechrevolution/devops-project-frontend:latest
 ```
 
-## Dockerfile Overview
+## Vue d'ensemble du Dockerfile
 
-**Location**: `./Dockerfile`
+**Emplacement** : `./Dockerfile`
 
-### Build Layers
+### Couches du build
 
 ```
-Layer 1: Node Builder (node:18-alpine)
-├── npm ci (locked dependencies)
-├── Copy source code
+Couche 1 : Node Builder (node:18-alpine)
+├── npm ci (dépendances verrouillées)
+├── Copie du code source
 └── npm run build → dist/
 
-Layer 2: Nginx Runtime (nginx:alpine)
-├── Remove default nginx config
-├── Add custom nginx.conf
-├── Copy dist/ from builder
-├── Add health check
-└── Start: nginx daemon off
+Couche 2 : Nginx Runtime (nginx:alpine)
+├── Suppression de la config Nginx par défaut
+├── Ajout du nginx.conf personnalisé
+├── Copie de dist/ depuis le builder
+├── Ajout du health check
+└── Démarrage : nginx daemon off
 ```
 
-### Size Analysis
+### Analyse de la taille
 
-| Image | Size | Note |
-|-------|------|------|
-| node:18-alpine | 170MB | Build stage |
-| Final image | 30-40MB | After multi-stage |
-| Size reduction | 80-82% | Massive savings |
+| Image | Taille | Note |
+|-------|--------|------|
+| node:18-alpine | 170 Mo | Étape de build |
+| Image finale | 30-40 Mo | Après le multi-stage |
+| Réduction | 80-82% | Gain considérable |
 
-## Nginx Configuration
+## Configuration Nginx
 
-**Location**: `./nginx.conf`
+**Emplacement** : `./nginx.conf`
 
-### Features
+### Fonctionnalités
 
-- SPA routing (`try_files $uri /index.html`)
-- API proxy (`/api/* → http://api:3000`)
-- Security headers (CSP, X-Frame-Options, etc.)
-- Gzip compression (text assets)
-- Browser caching (30 days for static files)
-- Health check endpoint (`/health`)
+- Routage SPA (`try_files $uri /index.html`)
+- Proxy API (`/api/* → http://api:3000`)
+- En-têtes de sécurité (CSP, X-Frame-Options, etc.)
+- Compression Gzip (assets texte)
+- Cache navigateur (30 jours pour les fichiers statiques)
+- Endpoint de health check (`/health`)
 
-### Customization
+### Personnalisation
 
-Edit `nginx.conf` to modify:
-- Server name/hostname
-- API proxy target
-- Security headers
-- Cache headers
-- Additional routes
+Modifier `nginx.conf` pour adapter :
+- Le nom de serveur / nom d'hôte
+- La cible du proxy API
+- Les en-têtes de sécurité
+- Les en-têtes de cache
+- Les routes supplémentaires
 
-## Environment Configuration
+## Configuration des variables d'environnement
 
-### Build-Time (Vite)
+### Au moment du build (Vite)
 
-Variables used during `npm run build`:
+Variables utilisées lors du `npm run build` :
 
-**From `.env` or Docker build args:**
+**Depuis `.env` ou les arguments Docker build :**
 ```
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
-### Runtime (Container)
+### À l'exécution (Container)
 
-Container environment variables (if needed):
+Variables d'environnement du container (si nécessaire) :
 
 ```bash
 docker run -e VITE_API_URL=https://api.example.com/api/v1 frontend
 ```
 
-**Note**: Vite environment is embedded at build time, not changeable at runtime.
+**Note** : L'environnement Vite est intégré au moment du build, il n'est pas modifiable à l'exécution.
 
-For runtime API URL changes, update nginx.conf API proxy instead.
+Pour changer l'URL de l'API à l'exécution, modifier le proxy API dans `nginx.conf` à la place.
 
 ## .dockerignore
 
-**File**: `./.dockerignore`
+**Fichier** : `./.dockerignore`
 
-Excludes from Docker build:
+Fichiers exclus du build Docker :
 
 ```
-node_modules/          # Don't copy, build fresh
-npm-debug.log          # Build artifacts
-dist/                  # Will be rebuilt
-.git/                  # Version control
-.gitignore             # Git config
+node_modules/          # Ne pas copier, reconstruire depuis zéro
+npm-debug.log          # Artefacts de build
+dist/                  # Sera reconstruit
+.git/                  # Contrôle de version
+.gitignore             # Configuration Git
 .env.local             # Secrets
 ```
 
-This keeps build context small and fast.
+Cela garde le contexte de build léger et rapide.
 
-## GitHub Actions Integration
+## Intégration GitHub Actions
 
-**Workflow**: `.github/workflows/frontend-docker-build-push.yml`
+**Workflow** : `.github/workflows/frontend-docker-build-push.yml`
 
-### Automation
+### Automatisation
 
-GitHub Actions:
-1. Watches for changes on `main` branch
-2. Watches for version tags (`v*`)
-3. Automatically builds image
-4. Pushes to Docker Hub (main/tags only)
-5. Skips push on PR (security)
+GitHub Actions :
+1. Surveille les modifications sur la branche `main`
+2. Surveille les tags de version (`v*`)
+3. Construit l'image automatiquement
+4. Publie sur Docker Hub (main/tags uniquement)
+5. Ignore la publication sur les PR (sécurité)
 
-### Manual Trigger
+### Déclenchement manuel
 
-To manually trigger build from GitHub UI:
+Pour déclencher manuellement un build depuis l'interface GitHub :
 
-1. Go to Actions tab
-2. Select "Build and Push Frontend to Docker Hub"
-3. Click "Run workflow" → Select branch
-4. Choose whether to push (requires API key, skipped once run starts)
+1. Aller dans l'onglet Actions
+2. Sélectionner "Build and Push Frontend to Docker Hub"
+3. Cliquer sur "Run workflow" → Sélectionner la branche
+4. Choisir si on publie (nécessite une clé API, ignoré une fois le run démarré)
 
-## Network Configuration
+## Configuration réseau
 
-### Docker Compose (Development)
+### Docker Compose (Développement)
 
 ```yaml
 frontend:
@@ -168,9 +168,9 @@ frontend:
     - projet_devops_network
 ```
 
-**Container Communication:**
-- Frontend → API: `http://api:3000/api/v1`
-- Frontend URL: `http://localhost:5173`
+**Communication entre containers :**
+- Frontend → API : `http://api:3000/api/v1`
+- URL du frontend : `http://localhost:5173`
 
 ### Docker Compose (Production)
 
@@ -185,7 +185,7 @@ frontend:
     - api
 ```
 
-**Note**: In production, API URL comes from environment, Nginx proxy handles routing.
+**Note** : En production, l'URL de l'API vient de l'environnement, le proxy Nginx gère le routage.
 
 ## Health Check
 
@@ -195,7 +195,7 @@ frontend:
 GET /health
 ```
 
-**Response:**
+**Réponse :**
 ```
 HTTP/1.1 200 OK
 Content-Type: text/plain
@@ -203,9 +203,9 @@ Content-Type: text/plain
 healthy
 ```
 
-### Docker Health Check
+### Health Check Docker
 
-Container includes:
+Le container inclut :
 
 ```yaml
 healthcheck:
@@ -216,217 +216,217 @@ healthcheck:
   start_period: 5s
 ```
 
-**Status**:
+**Statut** :
 ```bash
 docker inspect frontend --format='{{.State.Health.Status}}'
-# Output: healthy / unhealthy / none
+# Résultat : healthy / unhealthy / none
 ```
 
-## Volume Mounts
+## Montages de volumes
 
-### Development
+### Développement
 
-Mount source code for hot reload:
+Monter le code source pour le rechargement à chaud :
 
 ```bash
 docker run -v $(pwd)/src:/usr/share/nginx/html/src frontend
 ```
 
-**Note:** Requires special Nginx config for hot reload (not in standard config).
+**Note :** Nécessite une configuration Nginx spéciale pour le rechargement à chaud (non incluse dans la config standard).
 
 ### Production
 
-No volume mounts recommended. Image contains everything needed.
+Aucun montage de volume recommandé. L'image contient tout le nécessaire.
 
 ```bash
 docker run -d frontend
-# Image is self-contained
+# L'image est autonome
 ```
 
-## Port Mapping
+## Correspondance des ports
 
-### Standard Configuration
+### Configuration standard
 
-| Internal | External | Purpose |
-|----------|----------|---------|
-| 80 | 5173 (dev) / 80 (prod) | HTTP traffic |
+| Interne | Externe | Usage |
+|---------|---------|-------|
+| 80 | 5173 (dev) / 80 (prod) | Trafic HTTP |
 
-### Custom Ports
+### Ports personnalisés
 
-Set via Docker or docker-compose:
+Configurer via Docker ou docker-compose :
 
 ```yaml
 ports:
-  - "8080:80"  # Access on port 8080
+  - "8080:80"  # Accès sur le port 8080
 ```
 
 ## Logs
 
-### Docker Logs
+### Logs Docker
 
 ```bash
-# View logs
+# Voir les logs
 docker logs frontend
 
-# Follow logs (streaming)
+# Suivre les logs (streaming)
 docker logs -f frontend
 
-# Last 100 lines with timestamps
+# 100 dernières lignes avec horodatage
 docker logs --timestamps -n 100 frontend
 ```
 
-### Log Location (Inside Container)
+### Emplacement des logs (dans le container)
 
-Nginx logs: `/var/log/nginx/access.log` and `error.log`
+Logs Nginx : `/var/log/nginx/access.log` et `error.log`
 
-**To view inside container:**
+**Pour consulter depuis l'intérieur du container :**
 ```bash
 docker exec frontend tail -f /var/log/nginx/access.log
 ```
 
-## Performance Tuning
+## Optimisation des performances
 
-### Build Performance
+### Performance du build
 
-**Caching Strategy:**
-- Separate dependency layer (npm ci)
-- Often layer doesn't change, builds faster
-- Subsequent builds: ~3-4 minutes
+**Stratégie de cache :**
+- Couche de dépendances séparée (npm ci)
+- Cette couche ne change souvent pas, ce qui accélère les builds
+- Builds suivants : ~3-4 minutes
 
-**Optimization:**
+**Optimisation :**
 ```dockerfile
-# Good - copies only package files first
+# Bien - copier d'abord uniquement les fichiers de paquets
 COPY package*.json ./
 RUN npm ci
 
-# Bad - copies everything first
+# Mal - copier tout d'abord
 COPY . .
 RUN npm ci
 ```
 
-### Runtime Performance
+### Performance à l'exécution
 
-**Nginx Tuning:**
-- Gzip enabled (reduces transfer by 60-80%)
-- Browser cache 30 days (reduces requests)
-- Keep-alive enabled
-- Minimal header overhead
+**Réglages Nginx :**
+- Gzip activé (réduit le transfert de 60-80%)
+- Cache navigateur 30 jours (réduit les requêtes)
+- Keep-alive activé
+- Surcharge minimale des en-têtes
 
-**Metrics:**
-- Page load: ~500ms-1s
-- Image transfer: ~100-200KB (gzipped)
-- Static assets: Served from browser cache
+**Métriques :**
+- Chargement de page : ~500ms-1s
+- Transfert de l'image : ~100-200 Ko (gzippé)
+- Assets statiques : servis depuis le cache navigateur
 
-## Troubleshooting
+## Résolution des problèmes
 
-### Image Won't Build
+### L'image ne se construit pas
 
-**Error**: `ERR! code ERESOLVE`
+**Erreur** : `ERR! code ERESOLVE`
 
-**Cause**: Dependency conflict in npm
+**Cause** : Conflit de dépendances dans npm
 
-**Solution**:
-1. Check Node version matches
-2. Update package-lock.json: `npm install`
-3. Use `npm ci --legacy-peer-deps` if needed
+**Solution** :
+1. Vérifier que la version de Node correspond
+2. Mettre à jour package-lock.json : `npm install`
+3. Utiliser `npm ci --legacy-peer-deps` si nécessaire
 
-### Container Won't Start
+### Le container ne démarre pas
 
-**Error**: `nginx: [emerg] bind() to 0.0.0.0:80 failed`
+**Erreur** : `nginx: [emerg] bind() to 0.0.0.0:80 failed`
 
-**Cause**: Port 80 already in use
+**Cause** : Le port 80 est déjà utilisé
 
-**Solution**:
-- Use different port: `-p 8080:80`
-- Or stop conflicting container: `docker stop <name>`
+**Solution** :
+- Utiliser un port différent : `-p 8080:80`
+- Ou arrêter le container en conflit : `docker stop <nom>`
 
-### API Calls Fail from Frontend
+### Les appels API échouent depuis le frontend
 
-**Error**: `Failed to fetch` or CORS error
+**Erreur** : `Failed to fetch` ou erreur CORS
 
-**Cause**: Wrong VITE_API_URL
+**Cause** : `VITE_API_URL` incorrecte
 
-**Solution**:
-1. Verify `VITE_API_URL` environment variable
-2. Api must be accessible at URL specified
-3. Check Nginx proxy config in `nginx.conf`
+**Solution** :
+1. Vérifier la variable d'environnement `VITE_API_URL`
+2. L'API doit être accessible à l'URL spécifiée
+3. Vérifier la configuration du proxy Nginx dans `nginx.conf`
 
-### Slow Build Times
+### Build lent
 
-**Symptom**: Build takes > 10 minutes
+**Symptôme** : Le build prend plus de 10 minutes
 
-**Causes:**
-- First build (no cache)
-- Large node_modules
-- Network issues downloading packages
+**Causes :**
+- Premier build (pas de cache)
+- node_modules volumineux
+- Problèmes réseau lors du téléchargement des paquets
 
-**Solutions**:
-- Run subsequent builds (use cache)
-- Check machine resources
-- Increase Docker memory: Settings → Resources
+**Solutions** :
+- Lancer des builds suivants (utilisation du cache)
+- Vérifier les ressources de la machine
+- Augmenter la mémoire Docker : Settings → Resources
 
-## Security
+## Sécurité
 
 ### Permissions
 
-Container runs as:
-- **User**: `root` (Nginx requirement)
-- **Group**: `root`
+Le container s'exécute en tant que :
+- **Utilisateur** : `root` (requis par Nginx)
+- **Groupe** : `root`
 
-**Note**: Nginx itself doesn't run privileged, but container needs root for port 80 binding.
+**Note** : Nginx lui-même ne s'exécute pas avec des privilèges, mais le container a besoin de root pour lier le port 80.
 
 ### Secrets
 
-❌ Never include in image:
-- `.env` files
-- API keys
-- Passwords
+Ne jamais inclure dans l'image :
+- Fichiers `.env`
+- Clés API
+- Mots de passe
 
-✅ Use at runtime:
-- Environment variables
-- Mounted secrets
-- Configuration files
+Utiliser à l'exécution :
+- Variables d'environnement
+- Secrets montés
+- Fichiers de configuration
 
-### Base Image Security
+### Sécurité des images de base
 
-Regular updates:
-- `node:18-alpine` - Updated regularly
-- `nginx:alpine` - Updated regularly
+Mises à jour régulières :
+- `node:18-alpine` - mis à jour régulièrement
+- `nginx:alpine` - mis à jour régulièrement
 
-**Check for vulnerabilities:**
+**Vérifier les vulnérabilités :**
 ```bash
 docker scan spirittechrevolution/devops-project-frontend
 ```
 
 ## Maintenance
 
-### Updating Base Images
+### Mise à jour des images de base
 
 ```bash
-# Check for updates
+# Vérifier les mises à jour
 docker pull nginx:alpine
 docker pull node:18-alpine
 
-# Rebuild to get latest base
+# Reconstruire pour obtenir la dernière base
 docker build --no-cache .
 ```
 
-### Removing Old Images
+### Suppression des anciennes images
 
 ```bash
-# Remove specific image
+# Supprimer une image spécifique
 docker rmi spirittechrevolution/devops-project-frontend:old-tag
 
-# Remove dangling images
+# Supprimer les images orphelines
 docker image prune
 
-# Remove unused images
+# Supprimer les images inutilisées
 docker image prune -a
 ```
 
-## References
+## Références
 
-- [Dockerfile Best Practices](https://docs.docker.com/develop/dev-best-practices/dockerfile_best-practices/)
-- [Nginx Configuration](https://nginx.org/en/docs/ngx_core_module.html)
+- [Bonnes pratiques Dockerfile](https://docs.docker.com/develop/dev-best-practices/dockerfile_best-practices/)
+- [Configuration Nginx](https://nginx.org/en/docs/ngx_core_module.html)
 - [Node.js Docker](https://nodejs.org/en/docs/guides/nodejs-docker-webapp/)
 - [Alpine Linux](https://www.alpinelinux.org/)

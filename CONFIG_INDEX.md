@@ -1,302 +1,300 @@
-# Frontend Configuration Index
+# Index de configuration Frontend
 
-Central reference for all frontend configuration, documentation, and CI/CD setup.
+Référence centrale pour toute la configuration, la documentation et la configuration CI/CD du frontend.
 
-## 📖 Documentation Files
+## Fichiers de documentation
 
-Quick navigation to all frontend documentation:
+Navigation rapide vers toute la documentation frontend :
 
-### Getting Started
-- **[README.md](./README.md)** - Start here! Project overview and quick start guide
-- **[CONFIGURATION_SUMMARY.md](./CONFIGURATION_SUMMARY.md)** - Quick reference of all configurations
+### Premiers pas
+- **[README.md](./README.md)** - Commencer ici ! Présentation du projet et guide de démarrage rapide
+- **[CONFIGURATION_SUMMARY.md](./CONFIGURATION_SUMMARY.md)** - Référence rapide de toutes les configurations
 
-### Docker & Containerization
-- **[DOCKER.md](./DOCKER.md)** - Docker-specific documentation for the frontend
-- **[DOCKER_CONFIG.md](./DOCKER_CONFIG.md)** - Detailed Docker configuration and troubleshooting
-  - Build process
-  - Dockerfile structure
-  - Nginx configuration
+### Docker & Conteneurisation
+- **[DOCKER.md](./DOCKER.md)** - Documentation Docker spécifique au frontend
+- **[DOCKER_CONFIG.md](./DOCKER_CONFIG.md)** - Configuration Docker détaillée et résolution des problèmes
+  - Processus de build
+  - Structure du Dockerfile
+  - Configuration Nginx
   - Health checks
-  - Performance optimization
+  - Optimisation des performances
 
 ### CI/CD & GitHub Actions
-- **[GITHUB_CI_CD.md](./GITHUB_CI_CD.md)** - Complete GitHub Actions workflow documentation
-  - Workflow triggers
-  - Image tagging strategy
-  - Setup prerequisites
-  - Troubleshooting CI/CD
+- **[GITHUB_CI_CD.md](./GITHUB_CI_CD.md)** - Documentation complète du workflow GitHub Actions
+  - Déclencheurs du workflow
+  - Stratégie de tags des images
+  - Prérequis de configuration
+  - Résolution des problèmes CI/CD
 
-## 🐳 Docker Files
+## Fichiers Docker
 
 ### Dockerfile
 ```bash
-# Location: ./Dockerfile
-# Purpose: Multi-stage build for production image
-# Build stages:
+# Emplacement : ./Dockerfile
+# Objectif : Build multi-étapes pour l'image de production
+# Étapes de build :
 #   1. Node 18 Alpine (builder)
 #   2. Nginx Alpine (runtime)
-# Final size: ~30-40MB
+# Taille finale : ~30-40 Mo
 ```
 
-**Key features:**
-- Multi-stage build (90% size reduction)
-- Alpine Linux for small footprint
-- Security headers
-- Gzip compression
-- Health check endpoint
-- SPA routing support
+**Fonctionnalités clés :**
+- Build multi-étapes (réduction de 90% de la taille)
+- Alpine Linux pour un faible encombrement
+- En-têtes de sécurité
+- Compression Gzip
+- Endpoint de health check
+- Support du routage SPA
 
 ### nginx.conf
 ```bash
-# Location: ./nginx.conf
-# Purpose: Nginx web server configuration
-# Features:
-#   - SPA routing (try_files for React Router)
-#   - API proxy to backend (/api -> http://api:3000)
-#   - Security headers
-#   - Gzip compression
-#   - Browser cache headers
+# Emplacement : ./nginx.conf
+# Objectif : Configuration du serveur web Nginx
+# Fonctionnalités :
+#   - Routage SPA (try_files pour React Router)
+#   - Proxy API vers le backend (/api -> http://api:3000)
+#   - En-têtes de sécurité
+#   - Compression Gzip
+#   - En-têtes de cache navigateur
 ```
 
-**Customization points:**
-- Server name/domain
-- API proxy target
-- Cache durations
-- Security headers
+**Points de personnalisation :**
+- Nom de serveur / domaine
+- Cible du proxy API
+- Durées de cache
+- En-têtes de sécurité
 
-## 🔄 GitHub Actions Configuration
+## Configuration GitHub Actions
 
-### Active Workflow
+### Workflow actif
 ```
-Location: .github/workflows/frontend-docker-build-push.yml (root level)
+Emplacement : .github/workflows/frontend-docker-build-push.yml (niveau racine)
 
-Triggers:
-  - Push to main branch
-  - Create version tags (v1.0.0, etc.)
-  - Pull requests (build only, no push)
+Déclencheurs :
+  - Push sur la branche main
+  - Création de tags de version (v1.0.0, etc.)
+  - Pull requests (build uniquement, pas de push)
 
-Actions:
-  1. Builds Docker image
-  2. Uses GitHub caching
-  3. Logs into Docker Hub (if not PR)
-  4. Pushes image with semantic tags
-```
-
-### Workflow File Template
-```
-Location: .github-workflows/frontend-docker-build-push.yml
-
-This is a reference copy of the workflow.
-The actual active workflow is at: .github/workflows/frontend-docker-build-push.yml
+Actions :
+  1. Construit l'image Docker
+  2. Utilise le cache GitHub
+  3. Se connecte à Docker Hub (si pas une PR)
+  4. Publie l'image avec des tags sémantiques
 ```
 
-## 🛠️ Configuration Files
+### Modèle de fichier workflow
+```
+Emplacement : .github-workflows/frontend-docker-build-push.yml
+
+Il s'agit d'une copie de référence du workflow.
+Le workflow actif se trouve à : .github/workflows/frontend-docker-build-push.yml
+```
+
+## Fichiers de configuration
 
 ### .env.example
-Environment variables template for development:
+Modèle de variables d'environnement pour le développement :
 ```
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
 ### .dockerignore
-Files excluded from Docker build:
-- node_modules/ (rebuilt in container)
-- .git/ (version control)
+Fichiers exclus du build Docker :
+- node_modules/ (reconstruit dans le container)
+- .git/ (contrôle de version)
 - .env.local (secrets)
-- dist/ (rebuilt)
+- dist/ (reconstruit)
 
 ### vite.config.js
-Build tool configuration:
-- Dev server proxy
-- Build optimization
-- Port configuration (5173)
+Configuration de l'outil de build :
+- Proxy du serveur de développement
+- Optimisation du build
+- Configuration du port (5173)
 
 ### package.json
-Node.js dependencies:
+Dépendances Node.js :
 - react (18.2.0)
 - react-router-dom (7.13.2)
 - axios (1.6.0)
 - vite (5.0.0)
 
-## 📋 Project Structure
+## Structure du projet
 
 ```
 project_devops_front/
 │
-├── 📄 Documentation
-│   ├── README.md                      # Quick start & overview
-│   ├── CONFIGURATION_SUMMARY.md       # Quick reference
-│   ├── CONFIG_INDEX.md                # This file
-│   ├── DOCKER.md                      # Docker guide
-│   ├── DOCKER_CONFIG.md               # Docker details
-│   └── GITHUB_CI_CD.md               # CI/CD guide
+├── Documentation
+│   ├── README.md                      # Démarrage rapide & présentation
+│   ├── CONFIGURATION_SUMMARY.md       # Référence rapide
+│   ├── CONFIG_INDEX.md                # Ce fichier
+│   ├── DOCKER.md                      # Guide Docker
+│   ├── DOCKER_CONFIG.md               # Détails Docker
+│   └── GITHUB_CI_CD.md                # Guide CI/CD
 │
-├── 🐳 Docker Configuration
-│   ├── Dockerfile                     # Container image definition
-│   ├── nginx.conf                     # Web server config
-│   └── .dockerignore                  # Build exclusions
+├── Configuration Docker
+│   ├── Dockerfile                     # Définition de l'image container
+│   ├── nginx.conf                     # Configuration du serveur web
+│   └── .dockerignore                  # Exclusions du build
 │
-├── ⚙️ Build Configuration
-│   ├── vite.config.js                 # Vite settings
-│   ├── package.json                   # Dependencies
-│   ├── package-lock.json              # Locked versions
-│   └── .env.example                   # Env template
+├── Configuration du build
+│   ├── vite.config.js                 # Paramètres Vite
+│   ├── package.json                   # Dépendances
+│   ├── package-lock.json              # Versions verrouillées
+│   └── .env.example                   # Modèle d'environnement
 │
-├── 🔄 CI/CD Configuration
+├── Configuration CI/CD
 │   └── .github-workflows/
-│       └── frontend-docker-build-push.yml  # Workflow template
+│       └── frontend-docker-build-push.yml  # Modèle de workflow
 │
-├── 📦 Source Code
+├── Code source
 │   ├── src/
-│   │   ├── components/                # React components
-│   │   ├── pages/                     # Page components
-│   │   ├── services/                  # API services
-│   │   ├── styles/                    # CSS files
+│   │   ├── components/                # Composants React
+│   │   ├── pages/                     # Composants de pages
+│   │   ├── services/                  # Services API
+│   │   ├── styles/                    # Fichiers CSS
 │   │   ├── context/                   # React Context
-│   │   ├── App.jsx                    # Root component
-│   │   └── main.jsx                   # Entry point
-│   ├── public/                        # Static assets
-│   ├── index.html                     # HTML template
-│   └── .gitignore                     # Git exclusions
+│   │   ├── App.jsx                    # Composant racine
+│   │   └── main.jsx                   # Point d'entrée
+│   ├── public/                        # Assets statiques
+│   ├── index.html                     # Modèle HTML
+│   └── .gitignore                     # Exclusions Git
 │
-└── 👤 Other
-    └── .github-workflows/              # Reference workflows (docs only)
+└── Autre
+    └── .github-workflows/              # Workflows de référence (docs uniquement)
         └── frontend-docker-build-push.yml
 ```
 
-## 🚀 Quick Start Checklist
+## Checklist de démarrage rapide
 
-### 1. Local Development
+### 1. Développement local
 ```bash
 npm install
 npm run dev
-# Access: http://localhost:5173
+# Accès : http://localhost:5173
 ```
 
-### 2. Docker Testing
+### 2. Tests Docker
 ```bash
 docker build -t frontend:latest .
 docker run -p 5173:80 frontend:latest
-# Access: http://localhost:5173
+# Accès : http://localhost:5173
 ```
 
-### 3. Docker Compose (from backend folder)
+### 3. Docker Compose (depuis le dossier backend)
 ```bash
 cd ../projet-devops
 docker-compose up -d
-# Frontend: http://localhost:5173
+# Frontend : http://localhost:5173
 ```
 
-### 4. Deploy to Docker Hub
+### 4. Déployer sur Docker Hub
 ```bash
 docker tag frontend:latest spirittechrevolution/devops-project-frontend:latest
 docker push spirittechrevolution/devops-project-frontend:latest
 
-# Or let GitHub Actions do it:
-git push origin main  # Auto-builds and pushes
+# Ou laisser GitHub Actions le faire :
+git push origin main  # Build et push automatiques
 ```
 
-## 🔗 Cross-References
+## Références croisées
 
-### In This Directory
-- See [DOCKER.md](./DOCKER.md) for Docker specifics
-- See [DOCKER_CONFIG.md](./DOCKER_CONFIG.md) for advanced configuration
-- See [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) for CI/CD setup
+### Dans ce répertoire
+- Voir [DOCKER.md](./DOCKER.md) pour les spécificités Docker
+- Voir [DOCKER_CONFIG.md](./DOCKER_CONFIG.md) pour la configuration avancée
+- Voir [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) pour la configuration CI/CD
 
-### In Root Directory
-- [../README.md](../README.md) - Full project documentation
-- [../DOCKER_COMPLETE.md](../DOCKER_COMPLETE.md) - Complete Docker guide
-- [../GITHUB_ACTIONS.md](../GITHUB_ACTIONS.md) - GitHub Actions guide
-- [../GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md) - Secrets setup
-- [../DOCKER_BUILD.md](../DOCKER_BUILD.md) - Build and deployment guide
+### Dans le répertoire racine
+- [../README.md](../README.md) - Documentation complète du projet
+- [../DOCKER_COMPLETE.md](../DOCKER_COMPLETE.md) - Guide Docker complet
+- [../GITHUB_ACTIONS.md](../GITHUB_ACTIONS.md) - Guide GitHub Actions
+- [../GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md) - Configuration des secrets
+- [../DOCKER_BUILD.md](../DOCKER_BUILD.md) - Guide de build et déploiement
 
-### In Backend Directory
+### Dans le répertoire Backend
 - [../projet-devops/README.md](../projet-devops/README.md)
 - [../projet-devops/DOCKER.md](../projet-devops/DOCKER.md)
 - [../projet-devops/.github/workflows/](../projet-devops/.github/workflows/)
 
-## 📚 Reading Order
+## Ordre de lecture
 
-For different use cases:
+Selon les besoins :
 
-### I want to develop locally
-1. [README.md](./README.md) - Quick start
-2. [vite.config.js](./vite.config.js) - Dev configuration
+### Je veux développer en local
+1. [README.md](./README.md) - Démarrage rapide
+2. [vite.config.js](./vite.config.js) - Configuration de développement
 
-### I want to build Docker images
-1. [DOCKER.md](./DOCKER.md) - Overview
-2. [DOCKER_CONFIG.md](./DOCKER_CONFIG.md) - Details
-3. [Dockerfile](./Dockerfile) - Implementation
+### Je veux construire des images Docker
+1. [DOCKER.md](./DOCKER.md) - Vue d'ensemble
+2. [DOCKER_CONFIG.md](./DOCKER_CONFIG.md) - Détails
+3. [Dockerfile](./Dockerfile) - Implémentation
 
-### I want to set up CI/CD
-1. [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) - Setup guide
+### Je veux configurer le CI/CD
+1. [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) - Guide de configuration
 2. [../GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md) - Secrets
-3. [.github-workflows/](../.github-workflows/) - Templates
+3. [.github-workflows/](../.github-workflows/) - Modèles
 
-### I want to deploy to production
-1. [CONFIGURATION_SUMMARY.md](./CONFIGURATION_SUMMARY.md) - Overview
-2. [../DOCKER_COMPLETE.md](../DOCKER_COMPLETE.md) - Full Docker guide
-3. [../README.md](../README.md) - Deployment section
+### Je veux déployer en production
+1. [CONFIGURATION_SUMMARY.md](./CONFIGURATION_SUMMARY.md) - Vue d'ensemble
+2. [../DOCKER_COMPLETE.md](../DOCKER_COMPLETE.md) - Guide Docker complet
+3. [../README.md](../README.md) - Section déploiement
 
-## 🔐 Key Configuration Variables
+## Variables de configuration clés
 
-| Variable | Purpose | Example |
-|----------|---------|---------|
-| `DOCKER_USERNAME` | Docker Hub auth | `spirittechrevolution` |
-| `DOCKER_TOKEN` | Docker Hub token | (stored in GitHub Secrets) |
-| `VITE_API_URL` | Backend API URL | `http://localhost:3000/api/v1` |
-| `REGISTRY` | Docker registry | `docker.io` |
-| `IMAGE_NAME` | Image name | `spirittechrevolution/devops-project-frontend` |
+| Variable | Objectif | Exemple |
+|----------|----------|---------|
+| `DOCKER_USERNAME` | Auth Docker Hub | `spirittechrevolution` |
+| `DOCKER_TOKEN` | Token Docker Hub | (stocké dans les secrets GitHub) |
+| `VITE_API_URL` | URL de l'API backend | `http://localhost:3000/api/v1` |
+| `REGISTRY` | Registre Docker | `docker.io` |
+| `IMAGE_NAME` | Nom de l'image | `spirittechrevolution/devops-project-frontend` |
 
-## ✅ Verification Checklist
+## Checklist de vérification
 
-### Before Committing
-- [ ] Run `npm run build` succeeds
-- [ ] Dockerfile builds locally: `docker build .`
-- [ ] `.env.example` is up to date
-- [ ] Documentation updated
+### Avant de committer
+- [ ] `npm run build` réussit
+- [ ] Le Dockerfile se construit localement : `docker build .`
+- [ ] `.env.example` est à jour
+- [ ] Documentation mise à jour
 
-### Before Pushing to Main
-- [ ] All tests pass (if any)
-- [ ] Docker image builds on CI/CD
-- [ ] GitHub Actions secrets configured
-- [ ] Docker Hub repository exists
+### Avant de pousser sur main
+- [ ] Tous les tests passent (si applicable)
+- [ ] L'image Docker se construit sur CI/CD
+- [ ] Les secrets GitHub Actions sont configurés
+- [ ] Le dépôt Docker Hub existe
 
-### After Merging to Main
-- [ ] GitHub Actions workflow triggered
-- [ ] Build succeeds in Actions tab
-- [ ] Image pushed to Docker Hub
-- [ ] New tags available in Docker Hub
+### Après la fusion sur main
+- [ ] Le workflow GitHub Actions se déclenche
+- [ ] Le build réussit dans l'onglet Actions
+- [ ] L'image est publiée sur Docker Hub
+- [ ] Les nouveaux tags sont disponibles sur Docker Hub
 
-## 🆘 Getting Help
+## Obtenir de l'aide
 
-1. **Development Issues**: Check [README.md](./README.md) troubleshooting
-2. **Docker Issues**: Check [DOCKER_CONFIG.md](./DOCKER_CONFIG.md) troubleshooting
-3. **CI/CD Issues**: Check [GITHUB_CI_CD.md](./GITHUB_CI_CD.md) troubleshooting
-4. **Setup Issues**: Check [../GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md)
-5. **General Help**: Check [../README.md](../README.md)
+1. **Problèmes de développement** : Consulter la section dépannage de [README.md](./README.md)
+2. **Problèmes Docker** : Consulter la section dépannage de [DOCKER_CONFIG.md](./DOCKER_CONFIG.md)
+3. **Problèmes CI/CD** : Consulter la section dépannage de [GITHUB_CI_CD.md](./GITHUB_CI_CD.md)
+4. **Problèmes de configuration** : Consulter [../GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md)
+5. **Aide générale** : Consulter [../README.md](../README.md)
 
-## 📊 File Statistics
+## Statistiques des fichiers
 
-| Category | Count | Files |
-|----------|-------|-------|
-| Documentation | 6 | .md files |
-| Docker Config | 3 | Dockerfile, nginx.conf, .dockerignore |
-| Build Config | 5 | vite.config.js, package.json, .env.example, etc |
-| CI/CD | 1 | .github-workflows (templates) |
-| Source Code | Multiple | src/ directory |
+| Catégorie | Nombre | Fichiers |
+|-----------|--------|---------|
+| Documentation | 6 | Fichiers .md |
+| Configuration Docker | 3 | Dockerfile, nginx.conf, .dockerignore |
+| Configuration du build | 5 | vite.config.js, package.json, .env.example, etc. |
+| CI/CD | 1 | .github-workflows (modèles) |
+| Code source | Multiple | Répertoire src/ |
 
-## 🔄 Update History
+## Historique des modifications
 
-| Date | Change |
-|------|--------|
-| March 24, 2026 | Initial configuration setup |
-| | Created Docker configuration |
-| | Set up GitHub Actions CI/CD |
-| | Created documentation |
+| Date | Modification |
+|------|-------------|
+| Mars 2026 | Configuration initiale |
+| | Création de la configuration Docker |
+| | Mise en place du CI/CD GitHub Actions |
+| | Création de la documentation |
 
 ---
 
-**Last Updated**: March 24, 2026
-**Maintained by**: spirittechrevolution
-**Status**: Production Ready ✅
+**Dernière mise à jour** : 28 Mars 2026
