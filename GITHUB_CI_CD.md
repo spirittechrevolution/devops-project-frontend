@@ -1,75 +1,75 @@
-# Frontend GitHub Actions CI/CD Configuration
+# Configuration CI/CD GitHub Actions Frontend
 
-This directory contains documentation and configuration for the frontend's GitHub Actions CI/CD pipeline.
+Ce répertoire contient la documentation et la configuration du pipeline CI/CD GitHub Actions pour le frontend.
 
-## Overview
+## Vue d'ensemble
 
-The frontend application is automatically built and pushed to Docker Hub whenever changes are pushed to the main branch or when version tags are created.
+L'application frontend est automatiquement construite et publiée sur Docker Hub à chaque push sur la branche main ou lors de la création de tags de version.
 
-## Workflow Configuration
+## Configuration du workflow
 
-**Active Workflow**: `.github/workflows/frontend-docker-build-push.yml` (root level)
+**Workflow actif** : `.github/workflows/frontend-docker-build-push.yml` (niveau racine)
 
-This workflow:
-- ✅ Builds the frontend Docker image (multi-stage: Node builder + Nginx)
-- ✅ Pushes to Docker Hub on main branch pushes
-- ✅ Builds AND pushes on version tag creation (v1.0.0, etc.)
-- ✅ Only builds (no push) on pull requests
-- ✅ Uses GitHub Actions cache for faster builds
-- ✅ Automatically tags images with semantic versioning
+Ce workflow :
+- Construit l'image Docker frontend (multi-étapes : Node builder + Nginx)
+- Publie sur Docker Hub lors des pushs sur la branche main
+- Construit ET publie lors de la création de tags de version (v1.0.0, etc.)
+- Construit uniquement (pas de push) sur les pull requests
+- Utilise le cache GitHub Actions pour des builds plus rapides
+- Tague automatiquement les images avec le versionnage sémantique
 
-## Image Details
+## Détails de l'image
 
-| Property | Value |
-|----------|-------|
-| **Image Name** | `spirittechrevolution/devops-project-frontend` |
-| **Registry** | Docker Hub (`docker.io`) |
-| **Base Image** | `nginx:alpine` (production) |
-| **Build Time** | ~3-5 minutes |
-| **Image Size** | ~30-40MB |
-| **Docker Hub URL** | https://hub.docker.com/r/spirittechrevolution/devops-project-frontend |
+| Propriété | Valeur |
+|-----------|--------|
+| **Nom de l'image** | `spirittechrevolution/devops-project-frontend` |
+| **Registre** | Docker Hub (`docker.io`) |
+| **Image de base** | `nginx:alpine` (production) |
+| **Durée du build** | ~3-5 minutes |
+| **Taille de l'image** | ~30-40 Mo |
+| **URL Docker Hub** | https://hub.docker.com/r/spirittechrevolution/devops-project-frontend |
 
-## Trigger Events
+## Événements déclencheurs
 
-### Automatic Build & Push
+### Build automatique & Push
 
-Workflow runs and **pushes to Docker Hub** when:
-- Code is pushed to `main` branch
-- Version tag is created: `git tag v1.0.0`
+Le workflow s'exécute et **publie sur Docker Hub** lorsque :
+- Du code est poussé sur la branche `main`
+- Un tag de version est créé : `git tag v1.0.0`
 
-### Build Only (No Push)
+### Build uniquement (pas de push)
 
-Workflow runs but **does NOT push** when:
-- Pull request is opened against main
-- Other branches are pushed (not main)
+Le workflow s'exécute mais **ne publie PAS** lorsque :
+- Une pull request est ouverte sur main
+- D'autres branches sont poussées (pas main)
 
-## Git Triggers for Frontend
+## Déclencheurs Git pour le frontend
 
-The frontend workflow only triggers on:
+Le workflow frontend se déclenche uniquement sur :
 
 ```yaml
 paths:
-  - 'project_devops_front/**'        # Frontend changes
-  - '.github/workflows/frontend-*'  # Frontend workflow changes
+  - 'project_devops_front/**'        # Modifications frontend
+  - '.github/workflows/frontend-*'  # Modifications du workflow frontend
 ```
 
-This prevents unnecessary builds when only backend code changes.
+Cela évite des builds inutiles lorsque seul le code backend change.
 
-## Image Tagging Strategy
+## Stratégie de tags des images
 
-Images are automatically tagged based on git events:
+Les images sont automatiquement taguées selon les événements Git :
 
-### Push to Main
+### Push sur main
 ```
-Tags:
+Tags :
   - latest
   - main
   - sha-abc1234
 ```
 
-### Create Version Tag (git tag v1.2.3)
+### Création d'un tag de version (git tag v1.2.3)
 ```
-Tags:
+Tags :
   - v1.2.3
   - 1.2
   - 1
@@ -79,270 +79,270 @@ Tags:
 
 ### Pull Request
 ```
-Tags:
+Tags :
   - pr-42
   - sha-abc1234
 
-Note: NOT pushed to Docker Hub, only built
+Note : NON publié sur Docker Hub, seulement construit
 ```
 
-## Prerequisites
+## Prérequis
 
-### 1. Docker Hub Setup
+### 1. Configuration Docker Hub
 
-Create Docker Hub repositories:
+Créer des dépôts Docker Hub :
 
-**Backend Repository**
-- Name: `devops-project`
-- Description: Backend API container
-- Visibility: Public
+**Dépôt Backend**
+- Nom : `devops-project`
+- Description : Container API backend
+- Visibilité : Public
 
-**Frontend Repository**
-- Name: `devops-project-frontend`
-- Description: Frontend React/Vite container
-- Visibility: Public
+**Dépôt Frontend**
+- Nom : `devops-project-frontend`
+- Description : Container Frontend React/Vite
+- Visibilité : Public
 
-Access: https://hub.docker.com/orgs/spirittechrevolution
+Accès : https://hub.docker.com/orgs/spirittechrevolution
 
-### 2. GitHub Secrets
+### 2. Secrets GitHub
 
-Set in: **Repository Settings → Secrets and variables → Actions**
+Configurer dans : **Paramètres du dépôt → Secrets and variables → Actions**
 
-| Secret | Value |
-|--------|-------|
-| `DOCKER_USERNAME` | Your Docker Hub username |
-| `DOCKER_TOKEN` | Docker Hub access token (NOT password) |
+| Secret | Valeur |
+|--------|--------|
+| `DOCKER_USERNAME` | Votre nom d'utilisateur Docker Hub |
+| `DOCKER_TOKEN` | Token d'accès Docker Hub (PAS le mot de passe) |
 
-**Generate Docker Hub Token**:
-1. Go to https://hub.docker.com/settings/security
-2. Click "New Access Token"
-3. Name: `github-actions`
-4. Permissions: Read & Write
-5. Copy token to GitHub Secret as `DOCKER_TOKEN`
+**Générer un token Docker Hub** :
+1. Aller sur https://hub.docker.com/settings/security
+2. Cliquer sur "New Access Token"
+3. Nom : `github-actions`
+4. Permissions : Read & Write
+5. Copier le token dans le secret GitHub `DOCKER_TOKEN`
 
-## Environment Variables
+## Variables d'environnement
 
-### Build-Time (Vite Build)
+### Au moment du build (Build Vite)
 
-Frontend build uses these variables (if needed):
+Le build frontend utilise ces variables (si nécessaire) :
 
 ```bash
 VITE_API_URL=http://localhost:3000/api/v1
 ```
 
-### Runtime (Nginx)
+### À l'exécution (Nginx)
 
-Frontend container uses these variables:
+Le container frontend utilise ces variables :
 
 ```bash
-VITE_API_URL=https://api.example.com/api/v1  # In production
+VITE_API_URL=https://api.example.com/api/v1  # En production
 ```
 
-## Dockerfile Details
+## Détails du Dockerfile
 
-**Location**: `project_devops_front/Dockerfile`
+**Emplacement** : `project_devops_front/Dockerfile`
 
-**Multi-stage Build**:
+**Build multi-étapes** :
 
 ```
-Stage 1: Node 18 Alpine (Builder)
-├── npm ci (install dependencies)
-└── npm run build (create dist/)
+Étape 1 : Node 18 Alpine (Builder)
+├── npm ci (installation des dépendances)
+└── npm run build (création de dist/)
 
-Stage 2: Nginx Alpine (Runtime)
-├── Copy dist/ from builder
-├── Configure Nginx
-├── Health check endpoint
-└── Expose port 80
+Étape 2 : Nginx Alpine (Runtime)
+├── Copie de dist/ depuis le builder
+├── Configuration Nginx
+├── Endpoint de health check
+└── Exposition du port 80
 ```
 
-**Features**:
-- Multi-stage reduces final image size by ~90%
-- Alpine Linux for minimal footprint
-- Non-root user support
-- Health check for orchestration
-- Automatic SPA routing
+**Fonctionnalités** :
+- Le multi-étapes réduit la taille finale de l'image de ~90%
+- Alpine Linux pour un encombrement minimal
+- Support des utilisateurs non-root
+- Health check pour l'orchestration
+- Routage SPA automatique
 
-## Workflow Execution
+## Exécution du workflow
 
-### Step-by-Step Process
+### Processus étape par étape
 
-1. **Checkout Code**
-   - Clones repository at current commit
+1. **Récupération du code**
+   - Clone le dépôt au commit courant
 
-2. **Setup Docker Buildx**
-   - Enables advanced Docker build features
-   - Supports multi-platform builds
+2. **Configuration de Docker Buildx**
+   - Active les fonctionnalités avancées de build Docker
+   - Supporte les builds multi-plateformes
 
-3. **Login to Docker Hub** (if not PR)
-   - Uses `DOCKER_USERNAME` and `DOCKER_TOKEN` secrets
-   - Only on pushes to main or tags
+3. **Connexion à Docker Hub** (si pas une PR)
+   - Utilise les secrets `DOCKER_USERNAME` et `DOCKER_TOKEN`
+   - Uniquement sur les pushs sur main ou les tags
 
-4. **Extract Metadata**
-   - Generates tags based on git event
-   - Creates labels with build info
+4. **Extraction des métadonnées**
+   - Génère les tags selon l'événement Git
+   - Crée les labels avec les informations de build
 
 5. **Build & Push**
-   - Builds Docker image
-   - Uses GitHub Actions cache layer
-   - Pushes to Docker Hub (if not PR)
+   - Construit l'image Docker
+   - Utilise la couche de cache GitHub Actions
+   - Publie sur Docker Hub (si pas une PR)
 
-6. **Success Notification**
-   - Prints confirmation message
-   - Image available on Docker Hub
+6. **Notification de succès**
+   - Affiche un message de confirmation
+   - Image disponible sur Docker Hub
 
-### Typical Build Duration
+### Durée typique d'un build
 
-- **First Run**: ~5-7 minutes (builds cache)
-- **Subsequent Runs**: ~3-4 minutes (uses cache)
-- **CI/CD Overhead**: ~1 minute
+- **Premier run** : ~5-7 minutes (construction du cache)
+- **Runs suivants** : ~3-4 minutes (utilisation du cache)
+- **Overhead CI/CD** : ~1 minute
 
-## Monitoring Builds
+## Surveillance des builds
 
-### View Workflow Runs
+### Voir les runs du workflow
 
-1. Go to repository → **Actions** tab
-2. Select **"Build and Push Frontend to Docker Hub"** workflow
-3. Click a run to see details
-4. Expand "Build and push Frontend Docker image" step to see logs
+1. Aller dans le dépôt → onglet **Actions**
+2. Sélectionner le workflow **"Build and Push Frontend to Docker Hub"**
+3. Cliquer sur un run pour voir les détails
+4. Développer "Build and push Frontend Docker image" pour voir les logs
 
-### View on Docker Hub
+### Voir sur Docker Hub
 
-1. Go to https://hub.docker.com/r/spirittechrevolution/devops-project-frontend
-2. Click **Tags** tab
-3. See all available versions
-4. Latest tag should match your recent main push
+1. Aller sur https://hub.docker.com/r/spirittechrevolution/devops-project-frontend
+2. Cliquer sur l'onglet **Tags**
+3. Voir toutes les versions disponibles
+4. Le tag latest doit correspondre à votre push main récent
 
-### Command Line
+### Ligne de commande
 
 ```bash
-# View workflow runs
+# Voir les runs du workflow
 gh run list --workflow=frontend-docker-build-push.yml
 
-# View specific run
+# Voir un run spécifique
 gh run view <run-id> --log
 ```
 
-## Troubleshooting
+## Résolution des problèmes
 
-### Build Fails with "No matching Dockerfile"
+### Build échoue avec "No matching Dockerfile"
 
-**Error**: `COPY failed: stat ... no such file`
+**Erreur** : `COPY failed: stat ... no such file`
 
-**Solution**:
-- Verify Dockerfile exists at: `project_devops_front/Dockerfile`
-- Verify path in workflow: `file: ./project_devops_front/Dockerfile`
-- CI runs from repo root, not from frontend directory
+**Solution** :
+- Vérifier que le Dockerfile existe à : `project_devops_front/Dockerfile`
+- Vérifier le chemin dans le workflow : `file: ./project_devops_front/Dockerfile`
+- Le CI s'exécute depuis la racine du dépôt, pas depuis le répertoire frontend
 
-### "Denied: insufficient_data" on Push
+### "Denied: insufficient_data" lors du push
 
-**Error**: Authentication fails when pushing to Docker Hub
+**Erreur** : L'authentification échoue lors du push sur Docker Hub
 
-**Solution**:
-1. Verify `DOCKER_USERNAME` is correct (case-sensitive)
-2. Verify `DOCKER_TOKEN` is access token (not password)
-3. Regenerate token: https://hub.docker.com/settings/security
-4. Update GitHub Secret: Settings → Secrets → DOCKER_TOKEN
+**Solution** :
+1. Vérifier que `DOCKER_USERNAME` est correct (sensible à la casse)
+2. Vérifier que `DOCKER_TOKEN` est un token d'accès (pas un mot de passe)
+3. Régénérer le token : https://hub.docker.com/settings/security
+4. Mettre à jour le secret GitHub : Settings → Secrets → DOCKER_TOKEN
 
-### Image Built But Not Pushed
+### Image construite mais non publiée
 
-**Reason**: Pull Request event (intentional)
+**Raison** : Événement Pull Request (intentionnel)
 
-**Behavior**:
-- PR builds are tested without pushing
-- Only main branch pushes trigger Docker Hub push
-- This prevents accidental image overwrites
+**Comportement** :
+- Les builds sur PR sont testés sans publication
+- Seuls les pushs sur la branche main déclenchent une publication sur Docker Hub
+- Cela évite les écrasements accidentels d'images
 
-**Verify**:
-- Check event type: "push" vs "pull_request"
-- Look at step: "if: github.event_name != 'pull_request'"
+**Vérifier** :
+- Vérifier le type d'événement : "push" vs "pull_request"
+- Regarder l'étape : "if: github.event_name != 'pull_request'"
 
-### Timeout During Build
+### Timeout lors du build
 
-**Error**: Build takes longer than timeout (usually 6 hours)
+**Erreur** : Le build prend plus longtemps que le timeout (généralement 6 heures)
 
-**Solution**:
-- GitHub Actions free tier has 6-hour job limit
-- Large builds may exceed this
-- Configure timeout in workflow: `timeout-minutes: 30`
+**Solution** :
+- Le niveau gratuit de GitHub Actions a une limite de 6 heures par job
+- Les gros builds peuvent dépasser cette limite
+- Configurer le timeout dans le workflow : `timeout-minutes: 30`
 
-### Cache Not Working
+### Cache ne fonctionne pas
 
-**Symptom**: Each build takes full time (not faster)
+**Symptôme** : Chaque build prend le temps complet (pas plus rapide)
 
-**Solution**:
-- Cache requires successful build history
-- First build is slow, subsequent are faster
-- Cache persists for 7 days of inactivity
-- Manual cache clear in Settings → Actions
+**Solution** :
+- Le cache nécessite un historique de builds réussis
+- Le premier build est lent, les suivants sont plus rapides
+- Le cache persiste pendant 7 jours d'inactivité
+- Vider manuellement le cache dans Settings → Actions
 
-## Best Practices
+## Bonnes pratiques
 
-### 1. Keep Secrets Secure
+### 1. Garder les secrets sécurisés
 
 ```bash
-# ✅ Good - Use GitHub Secrets
+# Bien - utiliser les secrets GitHub
 docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_TOKEN }}
 
-# ❌ Bad - Never hardcode
+# Mal - ne jamais coder en dur
 docker login -u spirittechrevolution -p abc123secret
 ```
 
-### 2. Use Semantic Versioning for Tags
+### 2. Utiliser le versionnage sémantique pour les tags
 
 ```bash
-# Create version tag
+# Créer un tag de version
 git tag v1.0.0
 git push origin v1.0.0
 
-# This automatically:
-# - Triggers workflow
-# - Tags image as v1.0.0, 1.0, 1, latest
+# Cela déclenche automatiquement :
+# - Le workflow
+# - Le tag de l'image en v1.0.0, 1.0, 1, latest
 ```
 
-### 3. Test PR Before Merge
+### 3. Tester la PR avant la fusion
 
-- PR triggers build (no push)
-- Review build logs for errors
-- Merge only if build succeeds
+- Une PR déclenche le build (sans push)
+- Vérifier les logs de build pour détecter les erreurs
+- Fusionner uniquement si le build réussit
 
-### 4. Monitor Image Size
+### 4. Surveiller la taille de l'image
 
-Target image size: 30-50MB
+Taille cible de l'image : 30-50 Mo
 
 ```bash
-# Check locally
+# Vérifier en local
 docker build -t frontend:test .
 docker images frontend:test
 
-# If > 100MB, review Dockerfile for:
-# - Unused dependencies
-# - Large node_modules
-# - Missing .dockerignore
+# Si > 100 Mo, vérifier le Dockerfile pour :
+# - Dépendances inutilisées
+# - node_modules volumineux
+# - .dockerignore manquant
 ```
 
-### 5. Automatic Cleanup
+### 5. Nettoyage automatique
 
-GitHub Actions automatically:
-- Removes old cache (7+ days inactive)
-- Cleans up failed builds
-- No manual cleanup needed
+GitHub Actions nettoie automatiquement :
+- L'ancien cache (inactif depuis 7+ jours)
+- Les builds échoués
+- Pas de nettoyage manuel nécessaire
 
-## Advanced Configuration
+## Configuration avancée
 
-### Multi-Platform Builds
+### Builds multi-plateformes
 
-To build for ARM64 and AMD64:
+Pour construire pour ARM64 et AMD64 :
 
 ```yaml
 platforms: linux/amd64,linux/arm64
 ```
 
-Note: Requires QEMU or buildx setup.
+Note : Nécessite une configuration QEMU ou buildx.
 
-### Custom Build Arguments
+### Arguments de build personnalisés
 
-Pass variables during build:
+Passer des variables lors du build :
 
 ```yaml
 build-args: |
@@ -350,42 +350,42 @@ build-args: |
   VCS_REF=${{ github.sha }}
 ```
 
-### Push to Multiple Registries
+### Push vers plusieurs registres
 
-Login to multiple registries and push to all:
+Se connecter à plusieurs registres et pousser sur tous :
 
 ```yaml
-- name: Log in to Custom Registry
+- name: Se connecter au registre personnalisé
   uses: docker/login-action@v2
   with:
     registry: registry.example.com
 ```
 
-## Integration with Other Workflows
+## Intégration avec d'autres workflows
 
-### Backend Workflow (`docker-build-push.yml`)
+### Workflow Backend (`docker-build-push.yml`)
 
-- Builds backend separately
-- Runs independently of frontend
-- Both can trigger simultaneously
+- Construit le backend séparément
+- S'exécute indépendamment du frontend
+- Les deux peuvent se déclencher simultanément
 
-### Full Stack Workflow (`docker-build-push-all.yml`)
+### Workflow Full Stack (`docker-build-push-all.yml`)
 
-- Builds backend AND frontend in parallel
-- Useful for coordinated releases
-- Waits for both to succeed before notifying
+- Construit le backend ET le frontend en parallèle
+- Utile pour les releases coordonnées
+- Attend que les deux réussissent avant de notifier
 
-## References
+## Références
 
-- [GitHub Actions Docs](https://docs.github.com/en/actions)
+- [Documentation GitHub Actions](https://docs.github.com/en/actions)
 - [Docker Buildx](https://docs.docker.com/build/architecture/)
-- [Docker Hub API](https://docs.docker.com/docker-hub/api/latest/)
-- [Semantic Versioning](https://semver.org/)
+- [API Docker Hub](https://docs.docker.com/docker-hub/api/latest/)
+- [Versionnage sémantique](https://semver.org/)
 
 ## Support
 
-For issues:
-1. Check workflow logs in Actions tab
-2. Review this troubleshooting section
-3. Check Docker Hub repository status
-4. Review GitHub Status page: https://www.githubstatus.com
+En cas de problème :
+1. Vérifier les logs du workflow dans l'onglet Actions
+2. Consulter cette section de résolution des problèmes
+3. Vérifier le statut du dépôt Docker Hub
+4. Consulter la page de statut GitHub : https://www.githubstatus.com

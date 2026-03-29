@@ -1,83 +1,83 @@
-# Frontend Configuration Summary
+# Résumé de configuration Frontend
 
-Quick reference guide for the frontend Docker and CI/CD setup.
+Guide de référence rapide pour la configuration Docker et CI/CD du frontend.
 
-## 📁 Files in This Directory
+## Fichiers dans ce répertoire
 
-### Core Files
-- `Dockerfile` - Container image configuration
-- `nginx.conf` - Web server configuration
-- `package.json` - Node.js dependencies
-- `vite.config.js` - Build tool configuration
+### Fichiers principaux
+- `Dockerfile` - Configuration de l'image container
+- `nginx.conf` - Configuration du serveur web
+- `package.json` - Dépendances Node.js
+- `vite.config.js` - Configuration de l'outil de build
 
 ### Documentation
-| File | Purpose |
-|------|---------|
-| `README.md` | Project overview and quick start |
-| `DOCKER.md` | Docker-specific documentation |
-| `DOCKER_CONFIG.md` | Detailed Docker configuration |
-| `GITHUB_CI_CD.md` | GitHub Actions CI/CD guide |
+| Fichier | Objectif |
+|---------|----------|
+| `README.md` | Présentation du projet et démarrage rapide |
+| `DOCKER.md` | Documentation spécifique à Docker |
+| `DOCKER_CONFIG.md` | Configuration Docker détaillée |
+| `GITHUB_CI_CD.md` | Guide CI/CD GitHub Actions |
 
-### Configuration Templates
-- `.github-workflows/frontend-docker-build-push.yml` - Workflow template reference
-- `.env.example` - Environment variables template
-- `.dockerignore` - Files excluded from Docker build
+### Modèles de configuration
+- `.github-workflows/frontend-docker-build-push.yml` - Modèle de référence du workflow
+- `.env.example` - Modèle de variables d'environnement
+- `.dockerignore` - Fichiers exclus du build Docker
 
-## 🚀 Quick Commands
+## Commandes rapides
 
-### Local Development
+### Développement local
 ```bash
 npm install
 npm run dev
 ```
 
-### Docker Build & Run
+### Build & Lancement Docker
 ```bash
 docker build -t frontend:latest .
 docker run -p 5173:80 frontend:latest
 ```
 
-### Docker Compose (from backend folder)
+### Docker Compose (depuis le dossier backend)
 ```bash
 cd ../projet-devops
 docker-compose up -d
 ```
 
-## 🔄 CI/CD Pipeline Workflow
+## Workflow du pipeline CI/CD
 
-### Automated with GitHub Actions
+### Automatisé avec GitHub Actions
 
-**Trigger Events:**
-- Push to `main` branch → Build & Push to Docker Hub
-- Create tag `v*` → Build & Push with version tags
-- Pull Request → Build only (no Docker Hub push)
+**Événements déclencheurs :**
+- Push sur la branche `main` → Build & Push sur Docker Hub
+- Création du tag `v*` → Build & Push avec tags de version
+- Pull Request → Build uniquement (pas de push Docker Hub)
 
-**Workflow Location:**
-`.github/workflows/frontend-docker-build-push.yml` (root level)
+**Emplacement du workflow :**
+`.github/workflows/frontend-docker-build-push.yml` (niveau racine)
 
-**Image Published:**
+**Image publiée :**
 ```
 spirittechrevolution/devops-project-frontend:latest
 spirittechrevolution/devops-project-frontend:v1.0.0
 ```
 
-## Prerequisites
+## Prérequis
 
-### GitHub Secrets Required
-Set in: Repository Settings → Secrets and variables → Actions
+### Secrets GitHub requis
+Configurer dans : Paramètres du dépôt → Secrets and variables → Actions
 
-| Secret | Value |
-|--------|-------|
-| `DOCKER_USERNAME` | Docker Hub username |
-| `DOCKER_TOKEN` | Docker Hub access token |
+| Secret | Valeur |
+|--------|--------|
+| `DOCKER_USERNAME` | Nom d'utilisateur Docker Hub |
+| `DOCKER_TOKEN` | Token d'accès Docker Hub |
 
-### Docker Hub Repositories
+### Dépôts Docker Hub
 - `spirittechrevolution/devops-project-frontend` (frontend)
 
-## 📊 Configuration Files
+## Fichiers de configuration
 
 ### .dockerignore
-Excludes from Docker build:
+Exclut du build Docker :
 ```
 node_modules/
 dist/
@@ -86,53 +86,53 @@ dist/
 ```
 
 ### Dockerfile
-Multi-stage build:
-1. **Builder Stage**: Node 18 Alpine
-2. **Runtime Stage**: Nginx Alpine
-Final size: ~30-40MB
+Build multi-étapes :
+1. **Étape Builder** : Node 18 Alpine
+2. **Étape Runtime** : Nginx Alpine
+Taille finale : ~30-40 Mo
 
 ### nginx.conf
-Features:
-- SPA routing (React Router)
-- API proxy (/api → backend)
-- Security headers
-- Gzip compression
-- Browser caching (30 days)
+Fonctionnalités :
+- Routage SPA (React Router)
+- Proxy API (/api → backend)
+- En-têtes de sécurité
+- Compression Gzip
+- Cache navigateur (30 jours)
 
-## 🔗 Integration Points
+## Points d'intégration
 
-### Backend API
+### API Backend
 ```
-Development:  http://localhost:3000/api/v1
-Production:   https://api.example.com/api/v1
+Développement :  http://localhost:3000/api/v1
+Production :     https://api.example.com/api/v1
 ```
 
-**Proxy in nginx.conf:**
+**Proxy dans nginx.conf :**
 ```
 location /api/ {
   proxy_pass http://api:3000;
 }
 ```
 
-### Docker Compose Network
-Frontend communicates with backend via:
+### Réseau Docker Compose
+Le frontend communique avec le backend via :
 ```
 http://api:3000/api/v1
 ```
 
-## 📈 Image Tagging Strategy
+## Stratégie de tags des images
 
-Tags applied automatically by GitHub Actions:
+Tags appliqués automatiquement par GitHub Actions :
 
-| Git Event | Tags |
-|-----------|------|
-| Push to main | `latest`, `main`, `sha-abc123` |
+| Événement Git | Tags |
+|---------------|------|
+| Push sur main | `latest`, `main`, `sha-abc123` |
 | Tag v1.2.3 | `v1.2.3`, `1.2`, `1`, `latest` |
-| Pull Request | `pr-42` (not pushed) |
+| Pull Request | `pr-42` (non publié) |
 
-## ⚙️ Build Configuration
+## Configuration du build
 
-### Vite Config
+### Config Vite
 ```javascript
 // vite.config.js
 server: {
@@ -142,7 +142,7 @@ server: {
 }
 ```
 
-### npm Scripts
+### Scripts npm
 ```json
 {
   "dev": "vite",
@@ -151,107 +151,107 @@ server: {
 }
 ```
 
-## 🔐 Security
+## Sécurité
 
-### Never Commit
-- `.env` files with secrets
-- Docker credentials
-- API keys
+### Ne jamais committer
+- Fichiers `.env` contenant des secrets
+- Credentials Docker
+- Clés API
 
-### Always Use
-- GitHub Secrets for CI/CD
-- Environment variables for config
-- `.dockerignore` for build context
+### Toujours utiliser
+- GitHub Secrets pour le CI/CD
+- Variables d'environnement pour la configuration
+- `.dockerignore` pour le contexte de build
 
-## 📋 Checklist
+## Checklist
 
-### Initial Setup
-- [ ] Clone repository
-- [ ] Configure GitHub Secrets (`DOCKER_USERNAME`, `DOCKER_TOKEN`)
-- [ ] Create Docker Hub repository `devops-project-frontend`
-- [ ] Update this documentation if paths change
+### Configuration initiale
+- [ ] Cloner le dépôt
+- [ ] Configurer les secrets GitHub (`DOCKER_USERNAME`, `DOCKER_TOKEN`)
+- [ ] Créer le dépôt Docker Hub `devops-project-frontend`
+- [ ] Mettre à jour cette documentation si les chemins changent
 
-### Development
-- [ ] `npm install` for dependencies
-- [ ] `npm run dev` start development server
-- [ ] Test API calls to backend
-- [ ] Build locally: `npm run build`
+### Développement
+- [ ] `npm install` pour les dépendances
+- [ ] `npm run dev` pour démarrer le serveur de développement
+- [ ] Tester les appels API vers le backend
+- [ ] Build local : `npm run build`
 
-### Docker Testing
-- [ ] `docker build .` build locally
-- [ ] `docker run` test container
-- [ ] Verify health check: `curl http://localhost/health`
-- [ ] Check Nginx logs: `docker logs <container>`
+### Tests Docker
+- [ ] `docker build .` - construire localement
+- [ ] `docker run` - tester le container
+- [ ] Vérifier le health check : `curl http://localhost/health`
+- [ ] Vérifier les logs Nginx : `docker logs <container>`
 
-### Deployment
-- [ ] Push code to main branch
-- [ ] Verify GitHub Actions workflow runs
-- [ ] Check image on Docker Hub
-- [ ] Pull image: `docker pull spirittechrevolution/devops-project-frontend:latest`
-- [ ] Run with docker-compose
+### Déploiement
+- [ ] Pousser le code sur la branche main
+- [ ] Vérifier que le workflow GitHub Actions se déclenche
+- [ ] Vérifier l'image sur Docker Hub
+- [ ] Tirer l'image : `docker pull spirittechrevolution/devops-project-frontend:latest`
+- [ ] Lancer avec docker-compose
 
-## 🐛 Troubleshooting
+## Résolution des problèmes
 
-See documentation files for detailed troubleshooting:
-- [DOCKER_CONFIG.md](./DOCKER_CONFIG.md#troubleshooting)
-- [GITHUB_CI_CD.md](./GITHUB_CI_CD.md#troubleshooting)
+Consulter les fichiers de documentation pour un dépannage détaillé :
+- [DOCKER_CONFIG.md](./DOCKER_CONFIG.md#résolution-des-problèmes)
+- [GITHUB_CI_CD.md](./GITHUB_CI_CD.md#résolution-des-problèmes)
 
-Quick fixes:
+Corrections rapides :
 ```bash
-# Port in use?
+# Port déjà utilisé ?
 docker run -p 8080:80 frontend
 
-# Build failed?
+# Build échoué ?
 docker build --no-cache .
 
-# Logs?
+# Logs ?
 docker logs <container-id>
 
-# API not working?
+# API ne fonctionne pas ?
 docker exec frontend env | grep VITE_API_URL
 ```
 
-## 📚 Documentation Map
+## Carte de la documentation
 
 ```
 project_devops_front/
-├── README.md                          # Quick start & overview
-├── DOCKER.md                          # Docker specifics
-├── DOCKER_CONFIG.md                   # Detailed configuration
-├── GITHUB_CI_CD.md                    # GitHub Actions setup
-├── CONFIGURATION_SUMMARY.md           # This file
+├── README.md                          # Démarrage rapide & présentation
+├── DOCKER.md                          # Spécificités Docker
+├── DOCKER_CONFIG.md                   # Configuration détaillée
+├── GITHUB_CI_CD.md                    # Configuration GitHub Actions
+├── CONFIGURATION_SUMMARY.md           # Ce fichier
 │
 ├── .github-workflows/
-│   └── frontend-docker-build-push.yml # Workflow template reference
+│   └── frontend-docker-build-push.yml # Modèle de workflow de référence
 │
-├── Dockerfile                         # Container image definition
-├── nginx.conf                         # Nginx configuration
-├── .env.example                       # Environment template
-├── .dockerignore                      # Docker build exclusions
-├── vite.config.js                     # Build tool config
-├── package.json                       # Dependencies
+├── Dockerfile                         # Définition de l'image container
+├── nginx.conf                         # Configuration Nginx
+├── .env.example                       # Modèle d'environnement
+├── .dockerignore                      # Exclusions du build Docker
+├── vite.config.js                     # Configuration de l'outil de build
+├── package.json                       # Dépendances
 │
-└── src/                               # React source code
+└── src/                               # Code source React
 ```
 
-## 🔗 Related Documentation
+## Documentation associée
 
-- **Root README**: [../README.md](../README.md)
-- **Full Docker Guide**: [../DOCKER_COMPLETE.md](../DOCKER_COMPLETE.md)
-- **GitHub Actions Guide**: [../GITHUB_ACTIONS.md](../GITHUB_ACTIONS.md)
-- **Secrets Setup**: [../GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md)
+- **README racine** : [../README.md](../README.md)
+- **Guide Docker complet** : [../DOCKER_COMPLETE.md](../DOCKER_COMPLETE.md)
+- **Guide GitHub Actions** : [../GITHUB_ACTIONS.md](../GITHUB_ACTIONS.md)
+- **Configuration des secrets** : [../GITHUB_SECRETS_SETUP.md](../GITHUB_SECRETS_SETUP.md)
 
-## 📞 Support
+## Support
 
-For issues:
-1. Check relevant `.md` file in this directory
-2. Review GitHub Actions logs in Actions tab
-3. Check Docker logs: `docker logs <container>`
-4. Consult root-level documentation
+En cas de problème :
+1. Consulter le fichier `.md` correspondant dans ce répertoire
+2. Vérifier les logs GitHub Actions dans l'onglet Actions
+3. Vérifier les logs Docker : `docker logs <container>`
+4. Consulter la documentation au niveau racine
 
-## Version Info
+## Informations de version
 
-- **Frontend**: React 18.2.0, Vite 5.0.0
-- **Container**: Nginx Alpine, Node 18 Alpine
-- **Docker**: 20.10+
-- **Updated**: March 2026
+- **Frontend** : React 18.2.0, Vite 5.0.0
+- **Container** : Nginx Alpine, Node 18 Alpine
+- **Docker** : 20.10+
+- **Mis à jour** : 28 Mars 2026

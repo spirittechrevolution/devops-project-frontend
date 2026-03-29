@@ -1,64 +1,64 @@
-# Frontend Docker Documentation
+# Documentation Docker Frontend
 
-## Overview
+## Vue d'ensemble
 
-The frontend application is containerized using a multi-stage Docker build for optimal size and performance.
+L'application frontend est conteneurisée avec un build Docker multi-étapes pour une taille et des performances optimales.
 
-### Build Stages
-1. **Builder Stage**: Node.js 18 Alpine - builds the React app with Vite
-2. **Production Stage**: Nginx Alpine - serves the built static files
+### Étapes du build
+1. **Étape Builder** : Node.js 18 Alpine - compile l'application React avec Vite
+2. **Étape Production** : Nginx Alpine - sert les fichiers statiques compilés
 
 ## Architecture
 
 ```
-Frontend Container (Nginx)
+Container Frontend (Nginx)
     ├── Port 80 (HTTP)
-    ├── SPA Routing (try_files)
-    ├── API Proxy (/api/* -> API Container)
-    └── Security Headers & Caching
+    ├── Routage SPA (try_files)
+    ├── Proxy API (/api/* -> Container API)
+    └── En-têtes de sécurité & Cache
 ```
 
-## Building
+## Construction
 
-### Local Development
+### Développement local
 
 ```bash
-# Build the frontend image
+# Construire l'image frontend
 docker build -t projet_devops_frontend:latest .
 
-# Or from the root directory
+# Ou depuis le répertoire racine
 docker build -f project_devops_front/Dockerfile -t projet_devops_frontend:latest project_devops_front/
 ```
 
-### Production Image
+### Image de production
 
 ```bash
-# Build and tag for Docker Hub
+# Construire et tagger pour Docker Hub
 docker build -t spirittechrevolution/devops-project-frontend:latest .
 
-# Push to Docker Hub
+# Publier sur Docker Hub
 docker push spirittechrevolution/devops-project-frontend:latest
 ```
 
 ## Docker Compose
 
-### Development
+### Développement
 
 ```bash
-# Start all services including frontend
+# Démarrer tous les services incluant le frontend
 cd projet-devops
 docker-compose up -d
 
-# View logs
+# Voir les logs
 docker-compose logs -f frontend
 
-# Stop services
+# Arrêter les services
 docker-compose down
 ```
 
-The frontend will be available at:
-- **Local**: http://localhost:5173
-- **Via API Proxy**: http://localhost:5173/api/v1/*
+Le frontend sera accessible sur :
+- **Local** : http://localhost:5173
+- **Via proxy API** : http://localhost:5173/api/v1/*
 
 ### Production
 
@@ -66,87 +66,87 @@ The frontend will be available at:
 docker-compose -f docker-compose.prod.yml up -d
 ```
 
-Configuration via `.env` file:
+Configuration via fichier `.env` :
 ```
 FRONTEND_PORT=80
 VITE_API_URL=https://api.example.com/api/v1
 ```
 
-## Features
+## Fonctionnalités
 
-### Nginx Configuration
-- **Gzip Compression**: Enabled for text assets
-- **Caching Strategy**: 
-  - Static assets (30 days cache)
-  - Index.html (no cache for SPA updates)
-- **Security Headers**: X-Frame-Options, X-Content-Type-Options, etc.
-- **SPA Routing**: All requests to `/` except API calls
-- **API Proxy**: Routes `/api/*` to backend API container
-- **Health Check**: `/health` endpoint for orchestration
+### Configuration Nginx
+- **Compression Gzip** : Activée pour les assets texte
+- **Stratégie de cache** :
+  - Assets statiques (cache 30 jours)
+  - Index.html (pas de cache pour les mises à jour SPA)
+- **En-têtes de sécurité** : X-Frame-Options, X-Content-Type-Options, etc.
+- **Routage SPA** : Toutes les requêtes vers `/` sauf les appels API
+- **Proxy API** : Route `/api/*` vers le container API backend
+- **Health Check** : Endpoint `/health` pour l'orchestration
 
-### Environment Variables
+### Variables d'environnement
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `VITE_API_URL` | `http://localhost:3000/api/v1` | Backend API URL |
+| Variable | Par défaut | Description |
+|----------|------------|-------------|
+| `VITE_API_URL` | `http://localhost:3000/api/v1` | URL de l'API backend |
 
-## Network
+## Réseau
 
-Both containers communicate on the same Docker network:
-- **Network Name**: `projet_devops_network` (dev) / `projet_devops_network_prod` (prod)
-- **Frontend Container Name**: `projet_devops_frontend` (dev) / `projet_devops_frontend_prod` (prod)
-- **API Hostname**: `api` (dev) / `api` (prod)
+Les deux containers communiquent sur le même réseau Docker :
+- **Nom du réseau** : `projet_devops_network` (dev) / `projet_devops_network_prod` (prod)
+- **Nom du container frontend** : `projet_devops_frontend` (dev) / `projet_devops_frontend_prod` (prod)
+- **Nom d'hôte de l'API** : `api` (dev) / `api` (prod)
 
 ## Health Check
 
-The frontend container includes a health check:
-- **Endpoint**: `http://localhost/health`
-- **Interval**: 30 seconds
-- **Timeout**: 10 seconds
-- **Retries**: 3
-- **Start Period**: 10 seconds
+Le container frontend inclut un health check :
+- **Endpoint** : `http://localhost/health`
+- **Intervalle** : 30 secondes
+- **Timeout** : 10 secondes
+- **Tentatives** : 3
+- **Période de démarrage** : 10 secondes
 
-## Troubleshooting
+## Résolution des problèmes
 
-### Frontend returns 404 for routes
-This is expected behavior - Nginx is configured to serve `index.html` for all routes (SPA routing).
+### Le frontend retourne 404 pour les routes
+C'est le comportement attendu - Nginx est configuré pour servir `index.html` pour toutes les routes (routage SPA).
 
-### API calls fail from frontend
-Ensure the `VITE_API_URL` environment variable is correctly set and the API container is healthy.
+### Les appels API échouent depuis le frontend
+S'assurer que la variable d'environnement `VITE_API_URL` est correctement définie et que le container API est en bonne santé.
 
-### Static assets not loading
-Check the Nginx configuration and ensure the `/usr/share/nginx/html` directory contains the built files.
+### Les assets statiques ne se chargent pas
+Vérifier la configuration Nginx et s'assurer que le répertoire `/usr/share/nginx/html` contient les fichiers compilés.
 
-### Large image size
-Ensure you're using the multi-stage build which only includes Nginx in the final image, not Node.js.
+### Taille d'image trop grande
+S'assurer d'utiliser le build multi-étapes qui n'inclut que Nginx dans l'image finale, pas Node.js.
 
 ## Monitoring
 
-View container stats:
+Voir les statistiques du container :
 ```bash
 docker-compose stats frontend
 ```
 
-View real-time logs:
+Voir les logs en temps réel :
 ```bash
 docker-compose logs -f frontend
 ```
 
-## Performance Optimization
+## Optimisation des performances
 
-- **Multi-stage build**: Reduces final image size (~30-40MB vs 300-500MB with Node)
-- **Nginx caching**: Browser caching for static assets (30 days)
-- **Gzip compression**: Reduces transfer size
-- **Alpine Linux**: Lightweight base images
+- **Build multi-étapes** : Réduit la taille finale de l'image (~30-40 Mo vs 300-500 Mo avec Node)
+- **Cache Nginx** : Cache navigateur pour les assets statiques (30 jours)
+- **Compression Gzip** : Réduit la taille de transfert
+- **Alpine Linux** : Images de base légères
 
-## Image Information
+## Informations sur l'image
 
-**Development Image**
-- Size: ~30-40MB
-- Base: `nginx:alpine`
-- Requirements: Docker, Docker Compose
+**Image de développement**
+- Taille : ~30-40 Mo
+- Base : `nginx:alpine`
+- Prérequis : Docker, Docker Compose
 
-**Production Image**  
-- Repository: `spirittechrevolution/devops-project-frontend`
-- Tag: `latest`
-- Available on: Docker Hub
+**Image de production**
+- Dépôt : `spirittechrevolution/devops-project-frontend`
+- Tag : `latest`
+- Disponible sur : Docker Hub
