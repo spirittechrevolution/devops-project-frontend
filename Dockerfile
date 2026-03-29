@@ -1,7 +1,7 @@
 # Multi-stage build for React + Vite frontend
 
 # Stage 1: Build
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
